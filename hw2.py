@@ -33,7 +33,7 @@ class UserInterface(QMainWindow):
         openInputAct.triggered.connect(self.openImage)
 
         # Create Target Input Image Action
-        openTargetAct = QAction('&Save Result Omage', self)
+        openTargetAct = QAction('&Save Result Image', self)
         openTargetAct.setStatusTip('Save Result Image')
         openTargetAct.triggered.connect(self.saveImage)
 
@@ -185,14 +185,14 @@ class UserInterface(QMainWindow):
         wid.setLayout(self.vboxH)
 
         self.setGeometry(200, 200, 400, 300)
-        self.setWindowTitle('Histogram Equalization')
+        self.setWindowTitle('Filtering & Geometric Transformation')
         self.show()
 
     def openImage(self):
         # Open file dialog
         options = QFileDialog.Options()
         options |= QFileDialog.DontUseNativeDialog
-        self.inputImg, _ = QFileDialog.getOpenFileName(self,"QFileDialog.getOpenFileName()", "","All Files (*);;Python Files (*.py)", options=options)
+        self.inputImg, _ = QFileDialog.getOpenFileName(self,"Select Input Image", "","All Files (*);;Png Files (*.png)", options=options)
 
         if self.inputImg:
             # Insert image into first vertical box layout
@@ -204,7 +204,7 @@ class UserInterface(QMainWindow):
         # Open file dialog
         options = QFileDialog.Options()
         options |= QFileDialog.DontUseNativeDialog
-        fileName, _ = QFileDialog.getSaveFileName(self,"QFileDialog.getSaveFileName()","","All Files (*);;Png Files (*.png)", options=options)
+        fileName, _ = QFileDialog.getSaveFileName(self,"Enter Image Name","","All Files (*);;Png Files (*.png)", options=options)
 
         if fileName and self.resultImg != []:
             # Save result image
