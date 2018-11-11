@@ -11,7 +11,6 @@ from PyQt5 import QtWidgets
 import matplotlib.pyplot as plt
 import matplotlib.image as mpimg
 import numpy as np
-import cv2
 
 def main():
     app = QApplication(sys.argv)
@@ -23,7 +22,7 @@ class UserInterface(QMainWindow):
     def __init__(self):
         super().__init__()
         self.inputImg = ""
-        self.resultImg = ""
+        self.resultImg = []
         self.initUI()
 
     def initUI(self):
@@ -207,8 +206,11 @@ class UserInterface(QMainWindow):
         options |= QFileDialog.DontUseNativeDialog
         fileName, _ = QFileDialog.getSaveFileName(self,"QFileDialog.getSaveFileName()","","All Files (*);;Png Files (*.png)", options=options)
 
-        if fileName and self.resultImg:
-            print(fileName)
+        if fileName and self.resultImg != []:
+            # Save result image
+            plt.clf()
+            plt.imshow(self.resultImg)
+            plt.savefig(fileName)
         else:
             QMessageBox.about(self, "Error", "Result image not found or you did not enter a proper filename")
 
@@ -254,16 +256,7 @@ class UserInterface(QMainWindow):
                     newImage[...,1][row,col] = g[int(coord[1]),int(coord[0])]
                     newImage[...,2][row,col] = b[int(coord[1]),int(coord[0])]
 
-        # Save result image
-        plt.clf()
-        plt.imshow(newImage)
-        plt.show()
-        '''plt.savefig("resultPic.png")
-
-        # Insert result image into third vertical box layout
-        l2 = QLabel()
-        l2.setPixmap(QPixmap("resultPic.png"))
-        self.vbox2.addWidget(l2)'''
+        self.show_result_image(newImage)
 
     def scale(self, factor):
         # Show Error message if input image did not select
@@ -305,9 +298,8 @@ class UserInterface(QMainWindow):
                     newImage[...,0][row,col] = r[int(coord[1]),int(coord[0])]
                     newImage[...,1][row,col] = g[int(coord[1]),int(coord[0])]
                     newImage[...,2][row,col] = b[int(coord[1]),int(coord[0])]
-        plt.clf()
-        plt.imshow(newImage)
-        plt.show()
+
+        self.show_result_image(newImage)
 
     def translate(self, rotation):
         # Show Error message if input image did not select
@@ -344,9 +336,7 @@ class UserInterface(QMainWindow):
                     newImage[...,1][row][col] = g[row][col - 100]
                     newImage[...,2][row][col] = b[row][col - 100]
 
-        plt.clf()
-        plt.imshow(newImage)
-        plt.show()
+        self.show_result_image(newImage)
 
     def averageFilter(self, k):
         # Show Error message if input image did not select
@@ -408,9 +398,7 @@ class UserInterface(QMainWindow):
                 # Insert into new image
                 newImage[...,2][row][col] = total/(k*k)
 
-        plt.clf()
-        plt.imshow(newImage)
-        plt.show()
+        self.show_result_image(newImage)
 
     def medianFilter(self,k):
         # Show Error message if input image did not select
@@ -471,9 +459,7 @@ class UserInterface(QMainWindow):
                 # Insert into new image
                 newImage[...,2][row][col] = median
 
-        plt.clf()
-        plt.imshow(newImage)
-        plt.show()
+        self.show_result_image(newImage)
 
     def gaussianFilter(self, k):
         # Show Error message if input image did not select
@@ -554,9 +540,29 @@ class UserInterface(QMainWindow):
                 newImage[...,1][row][col] = sumG
                 newImage[...,2][row][col] = sumB
 
+        self.show_result_image(newImage)
+
+    def show_result_image(self,resultImage):
+        # Save result image
         plt.clf()
-        plt.imshow(newImage)
-        plt.show()
+        plt.imshow(resultImage)
+        plt.savefig("resultPic.png")
+
+        # Before insert into box layout, clear the box layout
+        for i in reversed(range(self.vbox2.count())):
+            self.vbox2.itemAt(i).widget().setParent(None)
+
+        # Add target label
+        title = QLabel('Result Image')
+        self.vbox2.addWidget(title)
+
+        # Insert result image into second vertical box layout
+        l2 = QLabel()
+        l2.setPixmap(QPixmap("resultPic.png"))
+        self.vbox2.addWidget(l2)
+
+        # Save result image into self.resultImg for accessing from saveImage function
+        self.resultImg = resultImage
 
 if __name__ == '__main__':
     main()
